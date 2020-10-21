@@ -1,6 +1,6 @@
 # passha
 
-Executes command in parallel on set of hosts
+Executes command in parallel on set of hosts. It's not using any dedicated ssh library, instead it's executing systems `ssh` command - to easilly make full use of `.ssh/config` mapping.
 
 ## Installation
 
@@ -19,6 +19,7 @@ Here's sample file:
 cmd: ps -ax | grep sidekiq
 hosts:
   - user@host
+  - otheruser@otherhost
 ```
 
 and run with

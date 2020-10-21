@@ -3,9 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"strings"
 
-	"github.com/gookit/color"
 	"github.com/integrii/flaggy"
 	"github.com/mlitwiniuk/passha/pkg/config"
 	"github.com/mlitwiniuk/passha/pkg/runner"
@@ -13,22 +11,20 @@ import (
 
 func main() {
 	configFile := "config.yml"
+	runInline := false
+	// timeout := 15
 	flaggy.String(&configFile, "c", "config", "Config file")
+	flaggy.Bool(&runInline, "i", "inline", "run inline rather than in parallel")
+	// flaggy.Int64(&timeout, "t", "timeout", "execution timeout")
 	flaggy.Parse()
 	cfg, err := config.LoadConfig(configFile)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 	fmt.Printf("Executing command `%s` on defined hosts\n", cfg.Cmd)
-	for _, host := range cfg.Hosts {
-
-		output, err := runner.RunCmdOnHost(cfg.Cmd, host)
-		if err != nil {
-			color.Red.Println(strings.ToUpper(host))
-			color.Red.Printf("Error: %s\n\n", err)
-		} else {
-			color.Green.Println(strings.ToUpper(host))
-			fmt.Printf("---\n%s--\n\n", output.String())
-		}
+	if runInline {
+		runner.RunOneByOne(cfg)
+	} else {
+		runner.RunInParallel(cfg)
 	}
 }
